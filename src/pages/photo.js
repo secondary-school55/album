@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Loader from "react-loader-spinner";
 import Layout from "c/Layout";
 import PhotoGallery from "c/PhotoGallery";
 
@@ -11,6 +12,8 @@ export default () => {
 	const [data, setData] = useState({ photos: [], album: [] });
 	const [text, setText] = useState("");
 
+	const isEmpty = () => data.photos.length === 0 && data.album.length === 0;
+
 	useEffect(() => {
 		getData().then(data => setData(data));
 	}, []);
@@ -20,13 +23,40 @@ export default () => {
 			{id !== undefined ? (
 				<PhotoGallery id={id} data={data} />
 			) : (
-				<List album={data.album} text={text} setText={setText} />
+				<List
+					album={data.album}
+					text={text}
+					setText={setText}
+					isEmpty={isEmpty}
+				/>
 			)}
 		</Layout>
 	);
 };
 
-function List({ album, text, setText }) {
+function List({ album, text, setText, isEmpty }) {
+	if (isEmpty())
+		return (
+			<>
+				<div>
+					<Loader
+						type="ThreeDots"
+						color="#00BFFF"
+						height={100}
+						width={100}
+					/>
+				</div>
+				<style jsx>{`
+					div {
+						display: flex;
+						justify-content: center;
+						align-items: center;
+						height: 100vh;
+					}
+				`}</style>
+			</>
+		);
+
 	return (
 		<>
 			<Filter album={album} text={text} setText={setText}>
