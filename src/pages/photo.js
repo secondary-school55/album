@@ -63,11 +63,10 @@ function List({ album, text, setText }) {
 			<Filter album={album} text={text} setText={setText}>
 				{album => (
 					<div className="grid">
-						{album.map(item => (
+						{album.map((item, i) => (
 							<React.Fragment key={item.id}>
 								<div className="date">
-									{item.date.day}.{item.date.month}.
-									{item.date.year}
+									{`${item.date.day}.${item.date.month}.${item.date.year}`}
 								</div>
 								<div>
 									<Link href={`?id=${item.id}`}>
