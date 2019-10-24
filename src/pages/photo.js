@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import Loader from "react-loader-spinner";
 import Layout from "c/Layout";
-import PhotoGallery from "c/PhotoGallery";
+import PhotoGallery, { fromList } from "c/PhotoGallery";
 
 export default () => {
 	const router = useRouter();
@@ -18,37 +18,43 @@ export default () => {
 		getData().then(data => setData(data));
 	}, []);
 
-	if (isEmpty())
-		return (
-			<Layout>
-				<div>
-					<Loader
-						type="ThreeDots"
-						color="#00BFFF"
-						height={100}
-						width={100}
-					/>
-				</div>
-				<style jsx>{`
-					div {
-						display: flex;
-						justify-content: center;
-						align-items: center;
-						height: 100vh;
-					}
-				`}</style>
-			</Layout>
-		);
+	let render;
 
-	return (
-		<Layout>
-			{id !== undefined ? (
-				<PhotoGallery id={id} data={data} />
-			) : (
-				<List album={data.album} text={text} setText={setText} />
-			)}
-		</Layout>
-	);
+	switch (true) {
+		case isEmpty():
+			render = (
+				<>
+					<div>
+						<Loader
+							type="ThreeDots"
+							color="#00BFFF"
+							height={100}
+							width={100}
+						/>
+					</div>
+					<style jsx>{`
+						div {
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							width: 100%;
+							height: 100vh;
+						}
+					`}</style>
+				</>
+			);
+
+			break;
+
+		case id !== undefined:
+			render = <PhotoGallery id={id} data={data} />;
+			break;
+
+		default:
+			render = <List album={data.album} text={text} setText={setText} />;
+	}
+
+	return <Layout title="Фотоальбом КЗШ І-ІІІ ст. №55">{render}</Layout>;
 };
 
 function List({ album, text, setText }) {
@@ -98,6 +104,7 @@ function Filter({ album, text, setText, children }) {
 			{children(data)}
 			<style jsx>{`
 				input {
+					box-sizing: border-box;
 					font-size: 1.2vw;
 					width: 100%;
 					position: sticky;

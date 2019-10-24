@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Router from "next/router";
 import Gallery from "react-photo-gallery";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import localCompare from "locale-compare";
@@ -25,9 +26,10 @@ export default ({ id, data }) => {
 function Header({ title, date, total }) {
 	return (
 		<div>
-			<div className="back" onClick={() => window.history.back()}>
+			<div className="back" onClick={() => Router.back()}>
 				Повернутися
 			</div>
+
 			{total > 0 && (
 				<>
 					<div className="date">
@@ -77,9 +79,8 @@ function Header({ title, date, total }) {
 function renderImage(items) {
 	return ({ index, key, photo }) => {
 		return (
-			<>
+			<React.Fragment key={key}>
 				<LazyLoadImage
-					key={key}
 					width={photo.width}
 					height={photo.height}
 					src={photo.src}
@@ -99,7 +100,7 @@ function renderImage(items) {
 						cursor: pointer;
 					}
 				`}</style>
-			</>
+			</React.Fragment>
 		);
 	};
 }

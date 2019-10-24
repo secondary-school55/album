@@ -1,11 +1,15 @@
 import React from "react";
+import Head from "next/head";
 
-export default ({ children }) => {
+export default ({ children, title }) => {
 	return (
 		<>
+			<Head>
+				<title>{title}</title>
+			</Head>
 			{children}
 			<style jsx global>{`
-				@import url("https://fonts.googleapis.com/css?family=Open+Sans|PT+Serif|&display=swap");
+				@import url("https://fonts.googleapis.com/css?family=PT+Serif&display=swap");
 
 				body {
 					font-family: PT Serif;
