@@ -11,6 +11,7 @@ export default ({ children }) => {
 					font-family: PT Serif;
 					margin: 0;
 					padding: 0;
+					overflow-y: scroll;
 				}
 				a {
 					text-decoration: none;

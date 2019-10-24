@@ -18,26 +18,9 @@ export default () => {
 		getData().then(data => setData(data));
 	}, []);
 
-	return (
-		<Layout>
-			{id !== undefined ? (
-				<PhotoGallery id={id} data={data} />
-			) : (
-				<List
-					album={data.album}
-					text={text}
-					setText={setText}
-					isEmpty={isEmpty}
-				/>
-			)}
-		</Layout>
-	);
-};
-
-function List({ album, text, setText, isEmpty }) {
 	if (isEmpty())
 		return (
-			<>
+			<Layout>
 				<div>
 					<Loader
 						type="ThreeDots"
@@ -54,9 +37,21 @@ function List({ album, text, setText, isEmpty }) {
 						height: 100vh;
 					}
 				`}</style>
-			</>
+			</Layout>
 		);
 
+	return (
+		<Layout>
+			{id !== undefined ? (
+				<PhotoGallery id={id} data={data} />
+			) : (
+				<List album={data.album} text={text} setText={setText} />
+			)}
+		</Layout>
+	);
+};
+
+function List({ album, text, setText }) {
 	return (
 		<>
 			<Filter album={album} text={text} setText={setText}>
