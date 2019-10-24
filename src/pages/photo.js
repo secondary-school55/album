@@ -100,12 +100,18 @@ function Filter({ album, text, setText, children }) {
 	);
 	return (
 		<>
-			<input onChange={e => setText(e.target.value)} value={text} />
+			<input
+				type="search"
+				placeholder="Пошук"
+				onChange={e => setText(e.target.value)}
+				value={text}
+			/>
 			{children(data)}
 			<style jsx>{`
 				input {
+					border: 0;
 					box-sizing: border-box;
-					font-size: 1.2vw;
+					font-size: 1.4vw;
 					width: 100%;
 					position: sticky;
 					left: 0;
