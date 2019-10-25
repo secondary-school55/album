@@ -109,6 +109,7 @@ function Filter({ album, text, setText, children }) {
 			<style jsx>{`
 				input {
 					border: 0;
+					border-bottom: 1px solid black;
 					box-sizing: border-box;
 					font-size: 1.4vw;
 					width: 100%;

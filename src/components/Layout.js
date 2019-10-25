@@ -15,7 +15,7 @@ export default ({ children, title }) => {
 					font-family: PT Serif;
 					margin: 0;
 					padding: 0;
-					overflow-y: visible;
+					overflow-y: scroll;
 				}
 				a {
 					text-decoration: none;

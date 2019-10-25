@@ -4,6 +4,7 @@ import Router from "next/router";
 import Gallery from "react-photo-gallery";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import localCompare from "locale-compare";
+import { FaArrowLeft } from "react-icons/fa";
 
 export default ({ id, data }) => {
 	const { photos, date, title, total } = findPhotos(id, data);
@@ -25,9 +26,9 @@ export default ({ id, data }) => {
 
 function Header({ title, date, total }) {
 	return (
-		<div>
+		<div className="root">
 			<div className="back" onClick={() => Router.back()}>
-				Повернутися
+				<FaArrowLeft />
 			</div>
 
 			{total > 0 && (
@@ -41,28 +42,38 @@ function Header({ title, date, total }) {
 			)}
 
 			<style jsx>{`
-				font-size: 2vw;
-				position: sticky;
-				left: 0;
-				top: 0;
-				width: 100%;
-				background-color: white;
-				z-index: 1;
-
-				.back {
-					width: auto;
-					z-index: 2;
-					color: blue;
-					cursor: pointer;
-					position: absolute;
-					top: 0;
+				.root {
+					position: sticky;
+					display: flex;
+					align-items: center;
+					flex-direction: column;
 					left: 0;
+					top: 0;
+					width: 100%;
+					background-color: rgba(0, 0, 0, 0.75);
+					z-index: 1;
+					color: white;
+					font-size: 1.3vw;
 				}
 
-				.back,
-				.date,
+				.back {
+					font-size: 1.4vw;
+					width: auto;
+					z-index: 2;
+					cursor: pointer;
+					position: absolute;
+					top: 50%;
+					left: 0.5vw;
+					transform: translateY(-50%);
+					background-color: transparent;
+				}
+
+				.date {
+					color: #00f3ff;
+				}
+
 				.total {
-					font-size: 1.5vw;
+					color: #53ff1b;
 				}
 
 				.title,
@@ -70,6 +81,10 @@ function Header({ title, date, total }) {
 				.date {
 					text-align: center;
 					width: 100%;
+				}
+
+				.title {
+					width: 95%;
 				}
 			`}</style>
 		</div>
