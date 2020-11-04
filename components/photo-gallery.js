@@ -6,23 +6,19 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import localCompare from "locale-compare";
 import { FaArrowLeft } from "react-icons/fa";
 
-export default ({ id, data }) => {
+export default function PhotoGallery({ id, data }) {
 	const { photos, date, title, total } = findPhotos(id, data);
 	return (
 		<>
 			<Header title={title} date={date} total={total} />
 			{photos.map((items, i) => (
 				<div key={i}>
-					<Gallery
-						photos={items}
-						margin={1}
-						renderImage={renderImage(items)}
-					/>
+					<Gallery photos={items} margin={1} renderImage={renderImage(items)} />
 				</div>
 			))}
 		</>
 	);
-};
+}
 
 function Header({ title, date, total }) {
 	return (
@@ -123,21 +119,20 @@ function renderImage(items) {
 function findPhotos(id, data) {
 	const { photos, album } = data;
 
-	const item = album.find(item => item.id === id);
-	if (item === undefined)
-		return { title: "", date: "", photos: [], total: 0 };
+	const item = album.find((item) => item.id === id);
+	if (item === undefined) return { title: "", date: "", photos: [], total: 0 };
 
 	const lc = localCompare();
 
-	const photos_filtered = item.slideshows.map(s => {
+	const photos_filtered = item.slideshows.map((s) => {
 		const p = photos
-			.filter(photo => photo.public_id.split("/")[0] === s)
-			.map(photo => ({
+			.filter((photo) => photo.public_id.split("/")[0] === s)
+			.map((photo) => ({
 				src: photo.preview_url,
 				download: photo.download_url,
 				width: photo.width,
 				height: photo.height,
-				id: photo.public_id
+				id: photo.public_id,
 			}));
 
 		p.sort((a, b) => lc(a.id, b.id));
@@ -151,6 +146,6 @@ function findPhotos(id, data) {
 		title: item.title,
 		date: item.date,
 		total,
-		photos: photos_filtered
+		photos: photos_filtered,
 	};
 }
