@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Loader from "react-loader-spinner";
@@ -17,91 +17,47 @@ export default function Index() {
     getData().then((data) => setData(data));
   }, []);
 
-  switch (true) {
-    case isEmpty():
-      return (
-        <>
-          <div>
-            <Loader type="ThreeDots" color="#00BFFF" height={100} width={100} />
-          </div>
-          <style jsx>{`
-            div {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              width: 100%;
-              height: 100vh;
-            }
-          `}</style>
-        </>
-      );
+  if (isEmpty())
+    return (
+      <>
+        <div>
+          <Loader type="ThreeDots" color="#00BFFF" height={100} width={100} />
+        </div>
+        <style jsx>{`
+          div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+          }
+        `}</style>
+      </>
+    );
 
-    case id !== undefined:
-      return <PhotoGallery id={id} data={data} />;
-  }
+  if (id !== undefined) return <PhotoGallery id={id} data={data} />;
   return <List album={data.album} text={text} setText={setText} />;
 }
 
 function List({ album, text, setText }) {
-  return (
-    <>
-      <Filter album={album} text={text} setText={setText}>
-        {(album) => (
-          <div className="grid">
-            {album.map((item, i) => (
-              <React.Fragment key={item.id}>
-                <div className="date">
-                  {`${item.date.day}.${item.date.month}.${item.date.year}`}
-                </div>
-                <div>
-                  <Link href={`?id=${item.id}`}>
-                    <a
-                      className="title"
-                      dangerouslySetInnerHTML={{ __html: item.title }}
-                    />
-                  </Link>
-                </div>
-              </React.Fragment>
-            ))}
-          </div>
-        )}
-      </Filter>
-      <style jsx>{`
-        .grid {
-          display: grid;
-          grid-template-columns: auto 1fr;
-          font-size: 1.7vw;
-        }
+  const filter = useMemo(() => {
+    const textLower = text.toLowerCase();
+    return album
+      .filter((item) => item.titleLower.includes(textLower))
+      .map((item) => {
+        if (textLower.length === 0) return item;
+        const pos = item.titleLower.indexOf(textLower);
 
-        .date {
-          margin-right: 1vw;
-        }
+        const begin = item.title.slice(0, pos);
+        const middle = item.title.slice(pos, pos + textLower.length);
+        const end = item.title.slice(pos + textLower.length);
 
-        .title :global(.highlight) {
-          color: red;
-        }
-      `}</style>
-    </>
-  );
-}
-
-function Filter({ album, text, setText, children }) {
-  const textLower = text.toLowerCase();
-  const data = album
-    .filter((item) => item.titleLower.includes(textLower))
-    .map((item) => {
-      if (textLower.length === 0) return item;
-      const pos = item.titleLower.indexOf(textLower);
-
-      const begin = item.title.slice(0, pos);
-      const middle = item.title.slice(pos, pos + textLower.length);
-      const end = item.title.slice(pos + textLower.length);
-
-      return {
-        ...item,
-        title: `${begin}<span class="highlight">${middle}</span>${end}`,
-      };
-    });
+        return {
+          ...item,
+          title: `${begin}<span class="highlight">${middle}</span>${end}`,
+        };
+      });
+  }, [text]);
 
   return (
     <>
@@ -111,8 +67,44 @@ function Filter({ album, text, setText, children }) {
         onChange={(e) => setText(e.target.value)}
         value={text}
       />
-      {children(data)}
+      <div className="grid">
+        {filter.map((item, i) => (
+          <div className="row" key={item.id}>
+            <div className="date">
+              {`${item.date.day}.${item.date.month}.${item.date.year}`}
+            </div>
+            <div>
+              <Link href={`?id=${item.id}`}>
+                <a
+                  className="title"
+                  dangerouslySetInnerHTML={{ __html: item.title }}
+                />
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
       <style jsx>{`
+        .grid {
+          font-size: 1.7vw;
+        }
+
+        .row {
+          display: flex;
+          flex-flow: row;
+        }
+
+        .date {
+          margin-right: 1vw;
+        }
+
+        .title {
+        }
+
+        .title :global(.highlight) {
+          color: red;
+        }
+
         input {
           border: 0;
           border-bottom: 1px solid black;
