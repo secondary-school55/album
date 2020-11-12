@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Loader from "react-loader-spinner";
+import { Virtuoso } from "react-virtuoso";
 import PhotoGallery, { fromList } from "components/photo-gallery";
 
 export default function Index() {
@@ -67,26 +68,44 @@ function List({ album, text, setText }) {
         onChange={(e) => setText(e.target.value)}
         value={text}
       />
-      <div className="grid">
-        {filter.map((item, i) => (
-          <div className="row" key={item.id}>
-            <div className="date">
-              {`${item.date.day}.${item.date.month}.${item.date.year}`}
+      <Virtuoso
+        style={{ width: "100%", height: "95vh", fontSize: "1.7vw" }}
+        totalCount={filter.length}
+        item={(i) => {
+          const item = filter[i];
+
+          return (
+            <div className="row">
+              <div className="date">
+                {`${item.date.day}.${item.date.month}.${item.date.year}`}
+              </div>
+              <div>
+                <Link href={`?id=${item.id}`}>
+                  <a
+                    className="title"
+                    dangerouslySetInnerHTML={{ __html: item.title }}
+                  />
+                </Link>
+              </div>
             </div>
-            <div>
-              <Link href={`?id=${item.id}`}>
-                <a
-                  className="title"
-                  dangerouslySetInnerHTML={{ __html: item.title }}
-                />
-              </Link>
-            </div>
-          </div>
-        ))}
-      </div>
+          );
+        }}
+      />
       <style jsx>{`
-        .grid {
-          font-size: 1.7vw;
+        input {
+          border: 0;
+          border-bottom: 1px solid black;
+          box-sizing: border-box;
+          font-size: 1.4vw;
+          width: 100%;
+          height: 2vw;
+          position: sticky;
+          left: 0;
+          top: 0;
+        }
+
+        input:focus {
+          outline: none;
         }
 
         .row {
@@ -103,17 +122,6 @@ function List({ album, text, setText }) {
 
         .title :global(.highlight) {
           color: red;
-        }
-
-        input {
-          border: 0;
-          border-bottom: 1px solid black;
-          box-sizing: border-box;
-          font-size: 1.4vw;
-          width: 100%;
-          position: sticky;
-          left: 0;
-          top: 0;
         }
       `}</style>
     </>
