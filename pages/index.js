@@ -121,7 +121,7 @@ function List({ album, text, setText }) {
         }
 
         .title :global(.highlight) {
-          color: red;
+          background-color: yellow;
         }
       `}</style>
     </>
