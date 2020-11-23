@@ -1,24 +1,19 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Loader from "react-loader-spinner";
 import { Virtuoso } from "react-virtuoso";
+import useSWR from "swr";
+
 import PhotoGallery, { fromList } from "components/photo-gallery";
 
 export default function Index() {
   const router = useRouter();
   const { id } = router.query;
-
-  const [data, setData] = useState({ photos: [], album: [] });
   const [text, setText] = useState("");
+  const album = useAlbum();
 
-  const isEmpty = () => data.photos.length === 0 && data.album.length === 0;
-
-  useEffect(() => {
-    getData().then((data) => setData(data));
-  }, []);
-
-  if (isEmpty())
+  if (!album)
     return (
       <>
         <div>
@@ -36,8 +31,8 @@ export default function Index() {
       </>
     );
 
-  if (id !== undefined) return <PhotoGallery id={id} data={data} />;
-  return <List album={data.album} text={text} setText={setText} />;
+  if (id !== undefined) return <PhotoGallery id={id} album={album} />;
+  return <List album={album} text={text} setText={setText} />;
 }
 
 function List({ album, text, setText }) {
@@ -128,20 +123,18 @@ function List({ album, text, setText }) {
   );
 }
 
-async function getData() {
-  const [photos, album] = await Promise.all([
-    fetch("https://api.school55.pp.ua/photos.json").then((r) => r.json()),
-    fetch("https://school55.pp.ua/album.json").then((r) => r.json()),
-  ]);
+function useAlbum() {
+  const { data, error } = useSWR("https://school55.pp.ua/album.json");
+  if (!data) return null;
 
-  album.reverse();
+  data.reverse();
 
-  for (const item of album) {
+  for (const item of data) {
     const id = item.date.id !== undefined ? `-${item.date.id}` : "";
-    item.id = `${item.date.year}-${item.date.month}-${item.date.day}${id}`;
+    item.id = `news-${item.date.year}-${item.date.month}-${item.date.day}${id}`;
     item.dateStr = `${item.date.day}.${item.date.month}.${item.date.year}`;
     item.titleLower = item.title.toLowerCase();
   }
 
-  return { photos, album };
+  return data;
 }

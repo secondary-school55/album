@@ -5,17 +5,18 @@ import Gallery from "react-photo-gallery";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import localCompare from "locale-compare";
 import { FaArrowLeft } from "react-icons/fa";
+import useSWR from "swr";
 
-export default function PhotoGallery({ id, data }) {
-	const { photos, date, title, total } = findPhotos(id, data);
+export default function PhotoGallery({ id, album }) {
+	const data = usePhotos(id, album);
+	if (!data) return null;
+
+	const { photos, date, title, total } = data;
+
 	return (
 		<>
 			<Header title={title} date={date} total={total} />
-			{photos.map((items, i) => (
-				<div key={i}>
-					<Gallery photos={items} margin={1} renderImage={renderImage(items)} />
-				</div>
-			))}
+			<Gallery photos={photos} margin={1} renderImage={renderImage(photos)} />
 		</>
 	);
 }
@@ -116,36 +117,31 @@ function renderImage(items) {
 	};
 }
 
-function findPhotos(id, data) {
-	const { photos, album } = data;
-
-	const item = album.find((item) => item.id === id);
+function usePhotos(id, album) {
+	const item = album.find((item) => item.id == id);
 	if (item === undefined) return { title: "", date: "", photos: [], total: 0 };
+
+	const { data, error } = useSWR(
+		`https://api.school55.pp.ua/api/albums/${item.slideshows[0]}`
+	);
+	if (!data) return undefined;
+
+	const photos = data.map((photo) => ({
+		src: photo.preview_url,
+		download: photo.download_url,
+		width: photo.width,
+		height: photo.height,
+		id: photo.public_id,
+	}));
 
 	const lc = localCompare();
 
-	const photos_filtered = item.slideshows.map((s) => {
-		const p = photos
-			.filter((photo) => photo.public_id.split("/")[0] === s)
-			.map((photo) => ({
-				src: photo.preview_url,
-				download: photo.download_url,
-				width: photo.width,
-				height: photo.height,
-				id: photo.public_id,
-			}));
-
-		p.sort((a, b) => lc(a.id, b.id));
-
-		return p;
-	});
-
-	const total = photos_filtered.reduce((a, b) => a + b.length, 0);
+	photos.sort((a, b) => lc(a.id, b.id));
 
 	return {
 		title: item.title,
 		date: item.date,
-		total,
-		photos: photos_filtered,
+		total: photos.length,
+		photos,
 	};
 }
