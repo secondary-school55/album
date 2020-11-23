@@ -11,11 +11,20 @@ export default function App({ Component, pageProps }) {
       </Head>
       <SWRConfig
         value={{
-          fetcher: (...args) => fetch(...args).then((res) => res.json()),
+          fetcher,
         }}
       >
         <Component {...pageProps} />
       </SWRConfig>
     </>
   );
+}
+
+function fetcher(...urls) {
+  const f = (u) => fetch(u).then((r) => r.json());
+
+  if (urls.length > 1) {
+    return Promise.all(urls.map(f));
+  }
+  return f(urls);
 }

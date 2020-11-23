@@ -125,17 +125,19 @@ function usePhotos(id, album) {
 	if (item === undefined) return { title: "", date: "", photos: [], total: 0 };
 
 	const { data } = useSWR(
-		`https://api.school55.pp.ua/api/albums/${item.slideshows[0]}`
+		item.slideshows.map((s) => `https://api.school55.pp.ua/api/albums/${s}`)
 	);
 	if (!data) return undefined;
 
-	const photos = data.map((photo) => ({
-		src: photo.preview_url,
-		download: photo.download_url,
-		width: photo.width,
-		height: photo.height,
-		id: photo.public_id,
-	}));
+	const photos = data
+		.reduce((a, b) => a.concat(b), [])
+		.map((photo) => ({
+			src: photo.preview_url,
+			download: photo.download_url,
+			width: photo.width,
+			height: photo.height,
+			id: photo.public_id,
+		}));
 
 	const lc = localCompare();
 
