@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import Loader from "react-loader-spinner";
 import { Virtuoso } from "react-virtuoso";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
 import PhotoGallery, { fromList } from "components/photo-gallery";
+import Loading from "components/loading";
 
 export default function Index() {
   const router = useRouter();
@@ -13,23 +13,7 @@ export default function Index() {
   const [text, setText] = useState("");
   const album = useAlbum();
 
-  if (!album)
-    return (
-      <>
-        <div>
-          <Loader type="ThreeDots" color="#00BFFF" height={100} width={100} />
-        </div>
-        <style jsx>{`
-          div {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100vh;
-          }
-        `}</style>
-      </>
-    );
+  if (!album) return <Loading />;
 
   if (id !== undefined) return <PhotoGallery id={id} album={album} />;
   return <List album={album} text={text} setText={setText} />;
@@ -124,17 +108,18 @@ function List({ album, text, setText }) {
 }
 
 function useAlbum() {
-  const { data, error } = useSWR("https://school55.pp.ua/album.json");
+  const { data } = useSWR("https://school55.pp.ua/album.json");
   if (!data) return null;
 
-  data.reverse();
+  const album = [...data];
+  album.reverse();
 
-  for (const item of data) {
+  for (const item of album) {
     const id = item.date.id !== undefined ? `-${item.date.id}` : "";
     item.id = `news-${item.date.year}-${item.date.month}-${item.date.day}${id}`;
     item.dateStr = `${item.date.day}.${item.date.month}.${item.date.year}`;
     item.titleLower = item.title.toLowerCase();
   }
 
-  return data;
+  return album;
 }

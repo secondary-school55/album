@@ -5,11 +5,14 @@ import Gallery from "react-photo-gallery";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import localCompare from "locale-compare";
 import { FaArrowLeft } from "react-icons/fa";
+import Loader from "react-loader-spinner";
 import useSWR from "swr";
+
+import Loading from "components/loading";
 
 export default function PhotoGallery({ id, album }) {
 	const data = usePhotos(id, album);
-	if (!data) return null;
+	if (!data) return <Loading />;
 
 	const { photos, date, title, total } = data;
 
@@ -121,7 +124,7 @@ function usePhotos(id, album) {
 	const item = album.find((item) => item.id == id);
 	if (item === undefined) return { title: "", date: "", photos: [], total: 0 };
 
-	const { data, error } = useSWR(
+	const { data } = useSWR(
 		`https://api.school55.pp.ua/api/albums/${item.slideshows[0]}`
 	);
 	if (!data) return undefined;

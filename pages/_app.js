@@ -1,11 +1,14 @@
-import Layout from "components/layout";
+import Head from "next/head";
 import { SWRConfig } from "swr";
 
 import "styles/global.css";
 
 export default function App({ Component, pageProps }) {
   return (
-    <Layout title="Фотоальбом КЗШ І-ІІІ ст. №55">
+    <>
+      <Head>
+        <title>Фотоальбом КЗШ І-ІІІ ст. №55</title>
+      </Head>
       <SWRConfig
         value={{
           fetcher: (...args) => fetch(...args).then((res) => res.json()),
@@ -13,6 +16,6 @@ export default function App({ Component, pageProps }) {
       >
         <Component {...pageProps} />
       </SWRConfig>
-    </Layout>
+    </>
   );
 }
